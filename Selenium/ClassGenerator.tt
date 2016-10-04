@@ -1,0 +1,327 @@
+﻿// Selenium Framework
+// Copyright(C) 2016 Eric Blond
+//
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with this program.If not, see <http://www.gnu.org/licenses/>.
+
+<#@ template debug="true" hostspecific="true" language="C#" #>
+<#@ output extension=".cs" #>
+<#@ assembly name="System" #>
+<#@ assembly name="System.Core" #>
+<#@ assembly name="System.Xml" #>
+<#@ assembly name="System.Xml.Linq" #>
+<#@ assembly name="PresentationFramework" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Xml.Linq" #>
+<#@ import namespace="System.Reflection" #>
+<#@ import namespace="System.Windows" #>
+<#@ import namespace="System.CodeDom" #>
+<#@ import namespace="Microsoft.CSharp" #>
+<#@ import namespace="System.Collections.Generic" #>
+
+<#
+	Load(this.Host.ResolvePath("mapping.xml"));
+#>
+
+// This file was automatically generated!
+
+using Hyperplan.Fluor;
+using Hyperplan.Selenium.Core;
+using System;
+using System.Windows;
+using System.Reflection;
+using System.Collections.Generic;
+
+namespace Hyperplan.Selenium
+{
+<#
+	var allTypes = from t in AppDomain.CurrentDomain.GetAssemblies()
+	                                  .SelectMany(a => a.GetTypes())
+                   where (typeof(FrameworkElement).IsAssignableFrom(t)
+				       || typeof(FrameworkContentElement).IsAssignableFrom(t))
+					  && !t.IsGenericType
+					  && !t.IsNested
+					  && t.IsPublic
+					  && !IsTypeExcluded(t)
+					  && !t.IsSealed
+                   orderby t.Name
+                   select t;
+				   
+	foreach (var type in allTypes)
+	{
+#>
+	public class <#= type.Name #> : <#= type.FullName #>
+	{
+<#
+		foreach (var prop in GetAllProperties(type))
+		{
+			if (prop.IsDProp)
+			{
+#>
+		DependencyPropertyBridge<<#= type.Name #>> bridge<#= prop.Info.Name #>;
+<#
+			}
+			else
+			{
+#>
+		RegularPropertyBridge<<#= type.Name #>> bridge<#= prop.Info.Name #>;
+<#
+			}
+		}
+		foreach (var coll in GetAllCollections(type))
+		{
+#>
+		CollectionPropertyBridge<<#= type.Name #>> bridge<#= coll.Name #>;
+
+<#
+		}
+#>
+
+		public <#= type.Name #>()
+		{
+<#
+		foreach (var prop in GetAllProperties(type))
+		{
+#>
+			_<#= prop.Info.Name #> = new Cache<<#= GetTypeText(prop.Info.PropertyType) #>>(() => base.<#= prop.Info.Name #>);
+<#
+		}
+		foreach (var coll in GetAllCollections(type))
+		{
+#>
+			_<#= coll.Name #> = new Cache<IEnumerable<<#= GetTypeText(coll.ElementType) #>>>(() =>
+			{
+				var result = new List<<#= GetTypeText(coll.ElementType) #>>();
+				foreach (var element in base.<#= coll.Name #>)
+                {
+                    result.Add((<#= GetTypeText(coll.ElementType) #>)element);
+				}
+				return result;
+			});
+<#
+		}
+#>
+		}
+
+		protected override void OnInitialized(EventArgs e)
+		{
+			base.OnInitialized(e);
+
+<#
+		foreach (var prop in GetAllProperties(type))
+		{
+			if (prop.IsDProp)
+			{
+#>
+			bridge<#= prop.Info.Name #> = new DependencyPropertyBridge<<#= type.Name #>>(this, "<#= prop.Info.Name #>");
+<#
+			}
+			else
+			{
+#>
+			bridge<#= prop.Info.Name #> = new RegularPropertyBridge<<#= type.Name #>>(this, "<#= prop.Info.Name #>");
+<#
+			}
+		}
+		foreach (var coll in GetAllCollections(type))
+		{
+#>
+			bridge<#= coll.Name #> = new CollectionPropertyBridge<<#= type.Name #>>(this, "<#= coll.Name #>");
+<#
+		}
+#>
+		}
+
+<#
+		foreach (var prop in GetAllProperties(type))
+		{
+#>
+		Cache<<#= GetTypeText(prop.Info.PropertyType) #>> _<#= prop.Info.Name #>;
+
+		public new virtual <#= GetTypeText(prop.Info.PropertyType) #> <#= prop.Info.Name #>
+		{
+			get
+			{
+				return _<#= prop.Info.Name #>.Get();
+			}
+
+			set
+			{
+				_<#= prop.Info.Name #>.Set(value);
+			}
+		}
+
+<#
+		}
+#>
+
+<#
+		foreach (var coll in GetAllCollections(type))
+		{
+#>
+		Cache<IEnumerable<<#= GetTypeText(coll.ElementType) #>>> _<#= coll.Name #>;
+
+		public new virtual IEnumerable<<#= GetTypeText(coll.ElementType) #>> <#= coll.Name #>
+		{
+			get
+			{
+				return _<#= coll.Name #>.Get();
+			}
+
+			set
+			{
+				_<#= coll.Name #>.Set(value);
+			}
+		}
+
+<#
+		}
+#>
+	}
+
+<#
+	}
+#>
+}
+
+<#+
+	CSharpCodeProvider provider = new CSharpCodeProvider();
+
+	string GetTypeText(Type type)
+	{
+		return provider.GetTypeOutput(new CodeTypeReference(type));
+	}
+
+	class Property
+	{
+		public PropertyInfo Info { get; set; }
+
+		public bool IsDProp
+		{
+			get
+			{
+				return Info.DeclaringType.GetField($"{Info.Name}Property") != null;
+			}
+		}
+	}
+
+	class Collection
+	{
+		public string Name { get; set; }
+		public Type ElementType { get; set; }
+	}
+
+	Dictionary<Type, Property[]> propMapping;
+	Dictionary<Type, Collection[]> collMapping;
+	List<string> excluded;
+
+	static Type GetType(string fullName)
+	{
+		foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies())
+		{
+			var result = assembly.GetType(fullName);
+			if (result != null)
+			{
+				return result;
+			}
+		}
+		return null;
+	}
+
+	void Load(string xmlPath)
+	{
+		var xdoc = XDocument.Load(xmlPath);
+
+		propMapping = new Dictionary<Type, Property[]>();
+		collMapping = new Dictionary<Type, Collection[]>();
+		foreach (var classNode in xdoc.Descendants("class"))
+		{
+			var classType = GetType(classNode.Attribute("id").Value);
+
+			var props = (from p in classNode.Elements("prop")
+			             select new Property() {
+							 Info = classType.GetProperty(p.Value),
+						 }).ToArray<Property>();
+			propMapping.Add(classType, props);
+
+			var colls = (from c in classNode.Elements("coll")
+			             select new Collection() {
+					         Name = c.Value,
+							 ElementType = GetType(c.Attribute("elt").Value)
+						 }).ToArray<Collection>();
+			collMapping.Add(classType, colls);
+		}
+
+		excluded = new List<string>();
+		foreach (var exclNode in xdoc.Descendants("excluded"))
+		{
+			excluded.Add(exclNode.Value);
+		}
+	}
+
+	bool IsTypeExcluded(Type type)
+	{
+		foreach (var excl in excluded)
+		{
+			if (excl[excl.Length - 1] == '*')
+			{
+				if (type.FullName.StartsWith(excl.Substring(0, excl.Length - 1)))
+				{
+					return true;
+				}
+			}
+			else
+			{
+				if (type.FullName.Equals(excl))
+				{
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+
+	Property[] GetAllProperties(Type type)
+	{
+		var typeName = type.Name;
+		var result = new List<Property>();
+		for (; type != typeof(object); type = type.BaseType)
+		{
+			Property[] props;
+			if (propMapping.TryGetValue(type, out props))
+			{
+				result.AddRange(from p in props
+				                where !p.Info.Name.Equals(typeName)
+								select p);
+			}
+		}
+		return result.OrderBy(p => p.Info.Name).ToArray<Property>();
+	}
+
+	Collection[] GetAllCollections(Type type)
+	{
+		var typeName = type.Name;
+		var result = new List<Collection>();
+		for (; type != typeof(object); type = type.BaseType)
+		{
+			Collection[] colls;
+			if (collMapping.TryGetValue(type, out colls))
+			{
+				result.AddRange(from c in colls
+				                where !c.Name.Equals(typeName)
+								select c);
+			}
+		}
+		return result.OrderBy(c => c.Name).ToArray<Collection>();
+	}
+#>

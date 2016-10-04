@@ -1,0 +1,175 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<mapping>
+
+  <class id="System.Windows.Controls.ColumnDefinition">
+    <prop>Width</prop>
+  </class>
+
+  <class id="System.Windows.Controls.ComboBox">
+    <prop>IsDropDownOpen</prop>
+    <prop>MaxDropDownHeight</prop>
+    <prop>ShouldPreserveUserEnteredPrefix</prop>
+    <prop>IsEditable</prop>
+    <prop>IsReadOnly</prop>
+    <prop>Text</prop>
+  </class>
+  
+  <class id="System.Windows.Controls.ContentControl">
+    <prop>Content</prop>
+  </class>
+
+  <class id="System.Windows.Controls.Control">
+    <prop>Background</prop>
+    <prop>FontFamily</prop>
+    <prop>FontSize</prop>
+    <prop>FontStretch</prop>
+    <prop>FontStyle</prop>
+    <prop>FontWeight</prop>
+    <prop>Foreground</prop>
+  </class>
+
+  <class id="System.Windows.Controls.DockPanel">
+    <prop>LastChildFill</prop>
+  </class>
+
+  <class id="System.Windows.Controls.Expander">
+    <prop>IsExpanded</prop>
+  </class>
+
+  <class id="System.Windows.Controls.Grid">
+    <coll elt="System.Windows.Controls.ColumnDefinition">ColumnDefinitions</coll>
+    <coll elt="System.Windows.Controls.RowDefinition">RowDefinitions</coll>
+  </class>
+
+  <class id="System.Windows.Controls.GridView">
+    <coll elt="System.Windows.Controls.GridViewColumn">Columns</coll>
+  </class>
+  
+  <class id="System.Windows.Controls.HeaderedContentControl">
+    <prop>Header</prop>
+  </class>
+
+  <class id="System.Windows.Controls.HeaderedItemsControl">
+    <prop>Header</prop>
+  </class>
+  
+  <class id="System.Windows.Controls.Image">
+    <prop>Source</prop>
+  </class>
+
+  <class id="System.Windows.Controls.ItemsControl">
+    <coll elt="System.Object">Items</coll>
+    <prop>ItemTemplate</prop>
+  </class>
+
+  <class id="System.Windows.Controls.ListBox">
+    <coll elt="System.Object">SelectedItems</coll>
+    <prop>SelectionMode</prop>
+  </class>
+
+  <class id="System.Windows.Controls.ListView">
+    <prop>View</prop>
+  </class>
+
+  <class id="System.Windows.Controls.MenuItem">
+    <prop>Icon</prop>
+    <prop>IsCheckable</prop>
+    <prop>IsChecked</prop>    
+  </class>
+  
+  <class id="System.Windows.Controls.Panel">
+    <coll elt="System.Windows.UIElement">Children</coll>
+  </class>
+  
+  <class id="System.Windows.Controls.Primitives.TextBoxBase">
+    <prop>IsReadOnly</prop>
+  </class>
+  
+  <class id="System.Windows.Controls.Primitives.ToggleButton">
+    <prop>IsChecked</prop>
+  </class>
+
+  <class id="System.Windows.Controls.Primitives.Selector">
+    <prop>SelectedItem</prop>
+  </class>
+  
+  <class id="System.Windows.Controls.RowDefinition">
+    <prop>Height</prop>
+  </class>
+
+  <class id="System.Windows.Controls.StackPanel">
+    <prop>Orientation</prop>
+  </class>
+  
+  <class id="System.Windows.Controls.TextBlock">
+    <prop>Background</prop>
+    <prop>FontSize</prop>
+    <prop>FontWeight</prop>
+    <prop>Padding</prop>
+    <prop>Text</prop>
+    <prop>TextAlignment</prop>
+  </class>
+  
+  <class id="System.Windows.Controls.TextBox">
+    <prop>Text</prop>
+  </class>
+
+  <class id="System.Windows.Controls.TreeView">
+    <prop>SelectedItem</prop>
+  </class>
+
+  <class id="System.Windows.Controls.TreeViewItem">
+    <prop>IsSelected</prop>
+  </class>
+  
+  <class id="System.Windows.Controls.WebBrowser">
+    <prop>Source</prop>
+  </class>
+
+  <class id="System.Windows.Controls.WrapPanel">
+    <prop>Orientation</prop>
+  </class>
+
+  <class id="System.Windows.FrameworkContentElement">
+    <prop>ContextMenu</prop>
+    <prop>Cursor</prop>
+    <prop>Name</prop>
+    <prop>Tag</prop>
+    <prop>ToolTip</prop>
+    <prop>Language</prop>
+  </class>
+  
+  <class id="System.Windows.FrameworkElement">
+    <prop>Height</prop>
+    <prop>HorizontalAlignment</prop>
+    <prop>Margin</prop>
+    <prop>Name</prop>
+    <prop>ToolTip</prop>
+    <prop>VerticalAlignment</prop>
+    <prop>Width</prop>
+    
+    <!-- From System.Windows.UIElement -->
+    <prop>IsEnabled</prop>
+  </class>
+
+  <class id="System.Windows.Window">
+    <prop>Title</prop>
+    <prop>WindowStartupLocation</prop>
+  </class>
+
+  <excluded>Microsoft.Internal.*</excluded>
+  <excluded>Microsoft.VisualStudio.*</excluded>
+  <excluded>System.Windows.Interop.*</excluded>
+  <excluded>System.Windows.Forms.*</excluded>
+  
+  <excluded>System.Windows.Controls.DefinitionBase</excluded>
+  <excluded>System.Windows.Controls.Primitives.GridViewRowPresenterBase</excluded>
+  <excluded>System.Windows.Controls.Primitives.TextBoxBase</excluded>
+  <excluded>System.Windows.Documents.Adorner</excluded>
+  <excluded>System.Windows.Documents.AdornerLayer</excluded>
+  <excluded>System.Windows.Documents.AnchoredBlock</excluded>
+  <excluded>System.Windows.Documents.TextElement</excluded>
+  <excluded>System.Windows.Interop.ActiveXHost</excluded>
+  <excluded>System.Windows.Shapes.Shape</excluded>
+
+</mapping>
