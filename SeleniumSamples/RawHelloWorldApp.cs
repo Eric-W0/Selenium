@@ -14,31 +14,36 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.If not, see <http://www.gnu.org/licenses/>.
 
-using Hyperplan.Fluor;
-using Hyperplan.Fluor.Library;
-using Hyperplan.Selenium;
 using System;
 using System.Windows;
 
 namespace Hyperplan.Selenium.Samples
 {
-    public static class WindowSizeApp
+    public static class RawHelloWorldApp
     {
         [STAThread]
         public static void Main()
         {
-            System.Windows.Application app = new System.Windows.Application();
-            app.Run(new Window().Let(w =>
+            var button = new Button()
             {
-                w.Title = "Window Size App";
-                w.Content = new TextBlock()
+                Content = "OK",
+                Width = 80
+            };
+            button.Click = (s, e) => Application.Current.Shutdown();
+
+            Application app = new Application();
+            app.Run(new Window()
+            {
+                Title = "Hello World!",
+                Height = 350.0,
+                Width = 525.0,
+                Content = new Grid()
                 {
                     HorizontalAlignment = HorizontalAlignment.Center,
                     VerticalAlignment = VerticalAlignment.Center,
-                    FontSize = 50.0,
-                    _Text_ = new Driver<string>(() => $"[{w.Width}x{w.Height}]")
-                };
-            }));
+                    Children = new UIElement[] { button }
+                }
+            });
         }
     }
 }

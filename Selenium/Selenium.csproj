@@ -31,7 +31,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Fluor, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Hyperplan.Fluor.1.1.1\lib\net45\Fluor.dll</HintPath>
+      <HintPath>..\packages\Hyperplan.Fluor.1.2.0\lib\net45\Fluor.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="PresentationCore" />
@@ -53,15 +53,21 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>ClassGenerator.tt</DependentUpon>
     </Compile>
-    <Compile Include="Core\BasePropertyBridge.cs" />
-    <Compile Include="Core\CollectionPropertyBridge.cs" />
-    <Compile Include="Core\PropertyChangeNotifier.cs" />
+    <Compile Include="Core\Bridge.cs" />
+    <Compile Include="Core\EventBridge.cs" />
+    <Compile Include="Core\HalfBind.cs" />
     <Compile Include="Core\RegularPropertyBridge.cs" />
+    <Compile Include="Core\PropertyBridge.cs" />
+    <Compile Include="Core\CollectionBridge.cs" />
+    <Compile Include="Core\PropertyChangeNotifier.cs" />
     <Compile Include="Core\DependencyPropertyBridge.cs" />
+    <Compile Include="Core\FullBind.cs" />
     <Compile Include="FunctionTemplate.cs" />
+    <Compile Include="SeleniumConfig.cs" />
     <Compile Include="TemplateControl.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Typed\ListBox.cs" />
+    <Compile Include="Utils.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="ClassGenerator.tt">

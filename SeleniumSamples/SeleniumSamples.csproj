@@ -33,11 +33,11 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup>
-    <StartupObject>Hyperplan.Selenium.Samples.TypedListBoxApp</StartupObject>
+    <StartupObject>Hyperplan.Selenium.Samples.ConverterMultiApp</StartupObject>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Fluor, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Hyperplan.Fluor.1.1.1\lib\net45\Fluor.dll</HintPath>
+      <HintPath>..\packages\Hyperplan.Fluor.1.2.0\lib\net45\Fluor.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="PresentationCore" />
@@ -56,6 +56,9 @@
     <Compile Include="ConverterMultiApp.cs" />
     <Compile Include="ConverterDualApp.cs" />
     <Compile Include="ConverterModelApp.cs" />
+    <Compile Include="FixedTextBoxApp.cs" />
+    <Compile Include="FixedWindowHeightApp.cs" />
+    <Compile Include="RawHelloWorldApp.cs" />
     <Compile Include="TypedListBoxApp.cs" />
     <Compile Include="DataTemplateApp.cs" />
     <Compile Include="WindowSizeApp.cs" />

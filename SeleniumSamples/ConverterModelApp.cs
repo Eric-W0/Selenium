@@ -14,238 +14,249 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.If not, see <http://www.gnu.org/licenses/>.
 
-//using Hyperplan.Fluor;
-//using Hyperplan.Selenium;
-//using System;
-//using System.Collections.Generic;
-//using System.Linq.Expressions;
-//using System.Windows;
+using Hyperplan.Fluor;
+using Hyperplan.Fluor.Library;
+using Hyperplan.Selenium;
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Linq.Expressions;
+using System.Windows;
+using System.Windows.Controls;
 
-//namespace Hyperplan.Selenium.Samples
-//{
-//    class ConverterModel
-//    {
-//        readonly Cell<int> _InputValue = new Cell<int>();
+namespace Hyperplan.Selenium.Samples
+{
+    class ConverterModel
+    {
+        Cell<int> inputValue = new Cell<int>();
 
-//        public int InputValue
-//        {
-//            get
-//            {
-//                return _InputValue.Get();
-//            }
+        public int InputValue
+        {
+            get
+            {
+                return inputValue.Value;
+            }
 
-//            set
-//            {
-//                _InputValue.Set(value);
-//            }
-//        }
+            set
+            {
+                inputValue.Value = value;
+            }
+        }
 
-//        readonly Cell<bool> _IsInputInCelsius = new Cell<bool>(true);
+        Cell<bool> isInputInCelsius = new Cell<bool>(true);
 
-//        public bool IsInputInCelsius
-//        {
-//            get
-//            {
-//                return _IsInputInCelsius.Get();
-//            }
+        public bool IsInputInCelsius
+        {
+            get
+            {
+                return isInputInCelsius.Value;
+            }
 
-//            set
-//            {
-//                _IsInputInCelsius.Set(value);
-//            }
-//        }
+            set
+            {
+                isInputInCelsius.Value = value;
+            }
+        }
 
-//        public int OutputValue
-//        {
-//            get
-//            {
-//                if (IsInputInCelsius)
-//                {
-//                    return (InputValue * 2) + 30;
-//                }
-//                else
-//                {
-//                    return (InputValue - 30) / 2;
-//                }
-//            }
-//        }
+        public int OutputValue
+        {
+            get
+            {
+                if (IsInputInCelsius)
+                {
+                    return (InputValue * 2) + 30;
+                }
+                else
+                {
+                    return (InputValue - 30) / 2;
+                }
+            }
+        }
 
-//        public bool IsOutputInCelsius => !IsInputInCelsius;
-//    }
+        public bool IsOutputInCelsius => !IsInputInCelsius;
+    }
 
-//    class ConverterView : StackPanel
-//    {
-//        internal IProperty<ConverterModel> _Model = new Cell<ConverterModel>(new ConverterModel());
-//        public ConverterModel Model
-//        {
-//            get
-//            {
-//                return _Model.Get();
-//            }
+    class ConverterView
+    {
+        public IProperty<ConverterModel> _Model_ = new Cell<ConverterModel>(new ConverterModel());
 
-//            set
-//            {
-//                _Model.Set(value);
-//            }
-//        }
+        public ConverterModel Model
+        {
+            get
+            {
+                return _Model_.Value;
+            }
 
-//        readonly Cell<string> _InvalidInput = new Cell<string>();
-//        string InvalidInput
-//        {
-//            get
-//            {
-//                return _InvalidInput.Get();
-//            }
+            set
+            {
+                _Model_.Value = value;
+            }
+        }
 
-//            set
-//            {
-//                _InvalidInput.Set(value);
-//            }
-//        }
+        Cell<string> invalidInput = new Cell<string>();
 
-//        string InputText
-//        {
-//            get
-//            {
-//                if (InvalidInput != null)
-//                {
-//                    return InvalidInput;
-//                }
-//                else
-//                {
-//                    return Model.InputValue.ToString();
-//                }
-//            }
+        string InvalidInput
+        {
+            get
+            {
+                return invalidInput.Value;
+            }
 
-//            set
-//            {
-//                int input;
-//                if (int.TryParse(value, out input))
-//                {
-//                    Model.InputValue = input;
-//                    InvalidInput = null;
-//                }
-//                else
-//                {
-//                    InvalidInput = value;
-//                }
-//            }
-//        }
+            set
+            {
+                invalidInput.Value = value;
+            }
+        }
 
-//        string OutputText
-//        {
-//            get
-//            {
-//                if (InvalidInput != null)
-//                {
-//                    if (InputText.Equals(""))
-//                    {
-//                        return "";
-//                    }
-//                    else
-//                    {
-//                        return "<error>";
-//                    }
-//                }
-//                else
-//                {
-//                    return Model.OutputValue.ToString();
-//                }
-//            }
-//        }
+        string InputText
+        {
+            get
+            {
+                if (InvalidInput != null)
+                {
+                    return InvalidInput;
+                }
+                else
+                {
+                    return Model.InputValue.ToString();
+                }
+            }
 
-//        bool? IsCelsiusChecked
-//        {
-//            get
-//            {
-//                return Model.IsInputInCelsius;
-//            }
+            set
+            {
+                int input;
+                if (int.TryParse(value, out input))
+                {
+                    Model.InputValue = input;
+                    InvalidInput = null;
+                }
+                else
+                {
+                    InvalidInput = value;
+                }
+            }
+        }
 
-//            set
-//            {
-//                Model.IsInputInCelsius = value ?? true;
-//            }
-//        }
+        string OutputText
+        {
+            get
+            {
+                if (InvalidInput != null)
+                {
+                    if (InputText.Equals(""))
+                    {
+                        return "";
+                    }
+                    else
+                    {
+                        return "<error>";
+                    }
+                }
+                else
+                {
+                    return Model.OutputValue.ToString();
+                }
+            }
+        }
 
-//        bool? IsFahrenheitChecked
-//        {
-//            get
-//            {
-//                return !Model.IsInputInCelsius;
-//            }
+        bool? IsCelsiusChecked
+        {
+            get
+            {
+                return Model.IsInputInCelsius;
+            }
 
-//            set
-//            {
-//                if (value == null)
-//                {
-//                    Model.IsInputInCelsius = false;
-//                }
-//                else
-//                {
-//                    Model.IsInputInCelsius = !value.Value;
-//                }
-//            }
-//        }
+            set
+            {
+                Model.IsInputInCelsius = value ?? true;
+            }
+        }
 
-//        public override IEnumerable<UIElement> Children => new UIElement[]
-//        {
-//            new TextBox()
-//            {
-//                _Text = new Link<string>(() => InputText),
-//                Width = 50,
-//                VerticalAlignment = VerticalAlignment.Center
-//            },
-//            new Canvas() { Width = 10 },
-//            new StackPanel()
-//            {
-//                Children = new UIElement[]
-//                {
-//                    new RadioButton()
-//                    {
-//                        Content = "Celsius",
-//                        _IsChecked = new Link<bool?>(() => IsCelsiusChecked)
-//                    },
-//                    new RadioButton()
-//                    {
-//                        Content = "Fahrenheit",
-//                        _IsChecked = new Link<bool?>(() => IsFahrenheitChecked)
-//                    }
-//                }
-//            },
-//            new Canvas() { Width = 10 },
-//            new Label()
-//            {
-//                Content = "=",
-//                VerticalAlignment = VerticalAlignment.Center
-//            },
-//            new Canvas() { Width = 10 },
-//            new TextBox()
-//            {
-//                _Text = new Property<string>(() => OutputText),
-//                IsReadOnly = true,
-//                Width = 50,
-//                VerticalAlignment = VerticalAlignment.Center
-//            }
-//        };
+        bool? IsFahrenheitChecked
+        {
+            get
+            {
+                return !Model.IsInputInCelsius;
+            }
 
-//        public override System.Windows.Controls.Orientation Orientation => System.Windows.Controls.Orientation.Horizontal;
-//    }
+            set
+            {
+                if (value == null)
+                {
+                    Model.IsInputInCelsius = false;
+                }
+                else
+                {
+                    Model.IsInputInCelsius = !value.Value;
+                }
+            }
+        }
 
-//    public static class ConverterModelApp
-//    {
-//        [STAThread]
-//        public static void Main()
-//        {
-//            System.Windows.Application app = new System.Windows.Application();
-//            app.Run(new Hyperplan.Selenium.Window()
-//            {
-//                Title = "Temperature Converter",
-//                Content = new ConverterView()
-//                {
-//                    HorizontalAlignment = HorizontalAlignment.Center,
-//                    VerticalAlignment = VerticalAlignment.Center
-//                }
-//            });
-//        }
-//    }
-//}
+        public UIElement UIElement
+        {
+            get
+            {
+                return new StackPanel()
+                {
+                    Children = new UIElement[]
+                    {
+                        new TextBox()
+                        {
+                            Width = 50,
+                            VerticalAlignment = VerticalAlignment.Center,
+                            _Text_ = new Member<string>(() => InputText)
+                        },
+                        new Canvas() { Width = 10 },
+                        new StackPanel()
+                        {
+                            Children = new UIElement[]
+                            {
+                                new RadioButton()
+                                {
+                                    Content = "Celsius",
+                                    _IsChecked_ = new Member<bool?>(() => IsCelsiusChecked)
+                                },
+                                new RadioButton()
+                                {
+                                    Content = "Fahrenheit",
+                                    _IsChecked_ = new Member<bool?>(() => IsFahrenheitChecked)
+                                },
+                            }
+                        },
+                        new Canvas() { Width = 10 },
+                        new Label()
+                        {
+                            Content = "=",
+                            VerticalAlignment = VerticalAlignment.Center
+                        },
+                        new Canvas() { Width = 10 },
+                        new TextBox()
+                        {
+                            IsReadOnly = true,
+                            Width = 50,
+                            VerticalAlignment = VerticalAlignment.Center,
+                            _Text_ = new Driver<string>(() => OutputText)
+                        }
+                    },
+                    Orientation = Orientation.Horizontal,
+                    HorizontalAlignment = HorizontalAlignment.Center,
+                    VerticalAlignment = VerticalAlignment.Center
+                };
+            }
+        }
+    }
+
+    public static class ConverterModelApp
+    {
+        [STAThread]
+        public static void Main()
+        {
+            System.Windows.Application app = new System.Windows.Application();
+            app.Run(new Hyperplan.Selenium.Window()
+            {
+                Title = "Temperature Converter",
+                Content = new ConverterView().UIElement
+            });
+        }
+    }
+}

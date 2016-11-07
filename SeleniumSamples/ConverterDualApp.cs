@@ -14,185 +14,200 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.If not, see <http://www.gnu.org/licenses/>.
 
-//using Hyperplan.Fluor;
-//using System;
-//using System.Collections.Generic;
-//using System.Linq;
-//using System.Text;
-//using System.Threading.Tasks;
-//using System.Windows;
-//using System.Windows.Controls;
+using Hyperplan.Fluor;
+using Hyperplan.Fluor.Library;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System.Windows;
+using System.Windows.Controls;
 
-//namespace Hyperplan.Selenium.Samples
-//{
-//    class ConverterView2 : StackPanel
-//    {
-//        internal IProperty<ConverterModel> _Model = new Cell<ConverterModel>(new ConverterModel());
-//        public ConverterModel Model
-//        {
-//            get
-//            {
-//                return _Model.Get();
-//            }
+namespace Hyperplan.Selenium.Samples
+{
+    class ConverterView2
+    {
+        public IProperty<ConverterModel> _Model_ = new Cell<ConverterModel>(new ConverterModel());
 
-//            set
-//            {
-//                _Model.Set(value);
-//            }
-//        }
+        public ConverterModel Model
+        {
+            get
+            {
+                return _Model_.Value;
+            }
 
-//        string InputText => Model.InputValue.ToString();
+            set
+            {
+                _Model_.Value = value;
+            }
+        }
 
-//        string OperationText
-//        {
-//            get
-//            {
-//                if (Delta > 0)
-//                {
-//                    return $"add {Delta}";
-//                }
-//                else if (Delta < 0)
-//                {
-//                    return $"subtract {Delta}";
-//                }
-//                else
-//                {
-//                    return $"keep the same";
-//                }
-//            }
-//        }
+        string InputText => Model.InputValue.ToString();
 
-//        int Delta => Model.OutputValue - Model.InputValue;
+        string OperationText
+        {
+            get
+            {
+                if (Delta > 0)
+                {
+                    return $"add {Delta}";
+                }
+                else if (Delta < 0)
+                {
+                    return $"subtract {Delta}";
+                }
+                else
+                {
+                    return $"keep the same";
+                }
+            }
+        }
 
-//        object InputMeasure => Model.IsInputInCelsius ? "Celsius" : "Fahrenheit";
-//        object OutputMeasure => Model.IsInputInCelsius ? "Fahrenheit" : "Celsius";
+        int Delta => Model.OutputValue - Model.InputValue;
 
-//        public override IEnumerable<UIElement> Children => new UIElement[]
-//        {
-//            new Label()
-//            {
-//                Content ="If you have",
-//                VerticalAlignment = VerticalAlignment.Center
-//            },
-//            new Canvas() { Width = 5 },
-//            new TextBox()
-//            {
-//                _Text = new Property<string>(() => InputText),
-//                Width = 50,
-//                VerticalAlignment = VerticalAlignment.Center,
-//                IsReadOnly = true
-//            },
-//            new Canvas() { Width = 5 },
-//            new Label()
-//            {
-//                _Content = new Property<object>(() => InputMeasure),
-//                VerticalAlignment = VerticalAlignment.Center
-//            },
-//            new Label()
-//            {
-//                Content = " , you'll have to ",
-//                VerticalAlignment = VerticalAlignment.Center
-//            },
-//            new Label()
-//            {
-//                _Content = new Property<object>(() => OperationText),
-//                VerticalAlignment = VerticalAlignment.Center
-//            },
-//            new Label()
-//            {
-//                Content = " to get ",
-//                VerticalAlignment = VerticalAlignment.Center
-//            },
-//            new Label()
-//            {
-//                _Content = new Property<object>(() => OutputMeasure),
-//                VerticalAlignment = VerticalAlignment.Center
-//            }
-//        };
+        object InputMeasure => Model.IsInputInCelsius ? "Celsius" : "Fahrenheit";
+        object OutputMeasure => Model.IsInputInCelsius ? "Fahrenheit" : "Celsius";
 
-//        public override Orientation Orientation => Orientation.Horizontal;
-//    }
+        public UIElement UIElement
+        {
+            get
+            {
+                return new StackPanel()
+                {
+                    Children = new UIElement[]
+                    {
+                        new Label()
+                        {
+                            Content ="If you have",
+                            VerticalAlignment = VerticalAlignment.Center
+                        },
+                        new Canvas() { Width = 5 },
+                        new TextBox()
+                        {
+                            Width = 50,
+                            VerticalAlignment = VerticalAlignment.Center,
+                            IsReadOnly = true,
+                            _Text_ = new Driver<string>(() => InputText)
+                        },
+                        new Canvas() { Width = 5 },
+                        new Label()
+                        {
+                            VerticalAlignment = VerticalAlignment.Center,
+                            _Content_ = new Driver<object>(() => InputMeasure)
+                        },
+                        new Label()
+                        {
+                            Content = " , you'll have to ",
+                            VerticalAlignment = VerticalAlignment.Center
+                        },
+                        new Label()
+                        {
+                            VerticalAlignment = VerticalAlignment.Center,
+                            _Content_ = new Driver<object>(() => OperationText)
+                        },
+                        new Label()
+                        {
+                            Content = " to get ",
+                            VerticalAlignment = VerticalAlignment.Center
+                        },
+                        new Label()
+                        {
+                            VerticalAlignment = VerticalAlignment.Center,
+                            _Content_ = new Driver<object>(() => OutputMeasure)
+                        }
+                    },
+                    Orientation = Orientation.Horizontal
+                };
+            }
+        }
+    }
 
-//    public class ConverterDualApp : System.Windows.Application
-//    {
-//        readonly IProperty<ConverterModel> _Model = new Cell<ConverterModel>(new ConverterModel());
-//        ConverterModel Model
-//        {
-//            get
-//            {
-//                return _Model.Get();
-//            }
+    public class ConverterDualApp : System.Windows.Application
+    {
+        Cell<ConverterModel> model = new Cell<ConverterModel>(new ConverterModel());
 
-//            set
-//            {
-//                _Model.Set(value);
-//            }
-//        }
+        ConverterModel Model
+        {
+            get
+            {
+                return model.Value;
+            }
 
-//        [STAThread]
-//        public static void Main()
-//        {
-//            var app = new ConverterDualApp();
-//            app.Run(new Hyperplan.Selenium.Window()
-//            {
-//                Title = "Temperature Converter - 2",
-//                Content = new DockPanel()
-//                {
-//                    Children = new UIElement[]
-//                    {
-//                        new ContentControl().Let(o1 =>
-//                        {
-//                            o1.Content = new Button().Let(o2 =>
-//                            {
-//                                o2.Content = "Reset";
-//                                o2.Margin = ConvertApi.Convert<int, Thickness>(10);
-//                                o2.Width = 80;
-//                                o2.VerticalAlignment = VerticalAlignment.Center;
-//                                o2.HorizontalAlignment = HorizontalAlignment.Center;
-//                                o2.Click += (s, e) => app.Model = new ConverterModel();
-//                            });
-//                            DockPanel.SetDock(o1, Dock.Bottom);
-//                        }),
-//                        new Grid()
-//                        {
-//                            RowDefinitions = new RowDefinition[]
-//                            {
-//                                new RowDefinition(),
-//                                new RowDefinition()
-//                            },
-//                            ColumnDefinitions = new ColumnDefinition[]
-//                            {
-//                                new ColumnDefinition()
-//                            },
-//                            Children = new UIElement[]
-//                            {
-//                                new GroupBox().Let(o =>
-//                                {
-//                                    o.Header = "First View";
-//                                    o.Content = new ConverterView()
-//                                    {
-//                                        _Model = app._Model
-//                                    };
-//                                    o.HorizontalAlignment = HorizontalAlignment.Center;
-//                                    o.VerticalAlignment = VerticalAlignment.Center;
-//                                    Grid.SetRow(o, 0);
-//                                }),
-//                                new GroupBox().Let(o =>
-//                                {
-//                                    o.Header = "Second View";
-//                                    o.Content = new ConverterView2()
-//                                    {
-//                                        _Model = app._Model
-//                                    };
-//                                    o.HorizontalAlignment = HorizontalAlignment.Center;
-//                                    o.VerticalAlignment = VerticalAlignment.Center;
-//                                    Grid.SetRow(o, 1);
-//                                })
-//                            }
-//                        }
-//                    }
-//                }
-//            });
-//        }
-//    }
-//}
+            set
+            {
+                model.Value = value;
+            }
+        }
+
+        [STAThread]
+        public static void Main()
+        {
+            var app = new ConverterDualApp();
+            app.Run(new Hyperplan.Selenium.Window()
+            {
+                Title = "Temperature Converter - 2",
+                Content = new DockPanel()
+                {
+                    Children = new UIElement[]
+                    {
+                        new ContentControl()
+                        {
+                            Content = new Button()
+                            {
+                                Content = "Reset",
+                                Margin = ConvertApi.Convert<int, Thickness>(10),
+                                Width = 80,
+                                VerticalAlignment = VerticalAlignment.Center,
+                                HorizontalAlignment = HorizontalAlignment.Center,
+                                Click = (s, e) =>
+                                {
+                                    app.Model = new ConverterModel();
+                                }
+                            },
+                            DockPanel_Dock = Dock.Bottom
+                        },
+
+                        new Grid()
+                        {
+                            RowDefinitions = new RowDefinition[]
+                            {
+                                new RowDefinition(),
+                                new RowDefinition()
+                            },
+                            ColumnDefinitions = new ColumnDefinition[]
+                            {
+                                new ColumnDefinition()
+                            },
+                            Children = new UIElement[]
+                            {
+                                new GroupBox()
+                                {
+                                    Header = "First View",
+                                    Content = new ConverterView()
+                                    {
+                                        _Model_ = new Driver<ConverterModel>(() => app.Model)
+                                    }.UIElement,
+                                    HorizontalAlignment = HorizontalAlignment.Center,
+                                    VerticalAlignment = VerticalAlignment.Center,
+                                    Grid_Row = 0
+                                },
+                                new GroupBox()
+                                {
+                                    Header = "Second View",
+                                    Content = new ConverterView2()
+                                    {
+                                        _Model_ = new Driver<ConverterModel>(() => app.Model)
+                                    }.UIElement,
+                                    HorizontalAlignment = HorizontalAlignment.Center,
+                                    VerticalAlignment = VerticalAlignment.Center,
+                                    Grid_Row = 1
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+    }
+}

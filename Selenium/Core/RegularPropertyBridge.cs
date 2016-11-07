@@ -15,27 +15,38 @@
 // along with this program.If not, see <http://www.gnu.org/licenses/>.
 
 using Hyperplan.Fluor;
-using Hyperplan.Selenium.Core;
+using Hyperplan.Fluor.Library;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
-using System.Windows;
+using System.Text;
+using System.Threading.Tasks;
 
 namespace Hyperplan.Selenium.Core
 {
-    class RegularPropertyBridge<T> : BasePropertyBridge<T, object, object>
+    class RegularPropertyBridge<TOwner, TValue> : PropertyBridge<TOwner, TValue, TValue>
     {
-        Monitor monitor;
+        HalfBind<TValue> bind;
 
-        internal RegularPropertyBridge(T owner, string name) : base(owner, name)
+        internal RegularPropertyBridge(TOwner owner, string name) : base(owner, name) { }
+
+        internal TValue InternalValue
         {
-            monitor = new Monitor(() =>
+            get
             {
-                var value = ExternalValue;
-                if (!object.Equals(value, InternalValue))
-                {
-                    InternalValue = value;
-                }
-            });
+                return NativeValue;
+            }
+
+            set
+            {
+                NativeValue = value;
+            }
+        }
+
+        internal void Activate()
+        {
+            bind = new HalfBind<TValue>(() => InternalValue, () => ExternalCachedValue);
         }
     }
 }

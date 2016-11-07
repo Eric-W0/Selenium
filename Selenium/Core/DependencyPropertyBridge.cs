@@ -15,40 +15,53 @@
 // along with this program.If not, see <http://www.gnu.org/licenses/>.
 
 using Hyperplan.Fluor;
+using Hyperplan.Fluor.Library;
 using System;
 using System.Reflection;
 using System.Windows;
 
 namespace Hyperplan.Selenium.Core
 {
-    class DependencyPropertyBridge<T> : RegularPropertyBridge<T> where T : DependencyObject
+    class DependencyPropertyBridge<TOwner, TValue> : RegularPropertyBridge<TOwner, TValue> where TOwner : DependencyObject
     {
         PropertyChangeNotifier notifier;
+        Beacon beacon;
+        FullBind<TValue> bind;
 
-        internal DependencyPropertyBridge(T owner, string name)
+        internal DependencyPropertyBridge(TOwner owner, string name)
             : base(owner, name)
         {
             notifier = new PropertyChangeNotifier(owner, name);
-            notifier.ValueChanged += (s, e) => UpdateExternalValue();
+            beacon = new Beacon();
+            notifier.ValueChanged += (s, e) =>
+            {
+                beacon.Signal();
+            };
         }
 
-        void UpdateExternalValue()
+        internal override TValue NativeValue
         {
-            var intValue = InternalValue;
-            var extValue = SnapshotApi.Snapshot(() => ExternalValue);
-            if (!object.Equals(intValue, extValue))
+            get
             {
-                ExternalValue = intValue;
+                if (!Snapshot.IsActive)
+                {
+                    beacon.Register();
+                }
+                return base.NativeValue;
             }
-            extValue = SnapshotApi.Snapshot(() => ExternalValue);
-            if (extValue != intValue)
-            {
-                // Means the Set() was ignored, so we need to honor this behavior
-                // by redirecting back the change to the origin (a DP will always accept
-                // an assignment?)
 
-                InternalValue = extValue;
+            set
+            {
+                using (new Snapshot())
+                {
+                    base.NativeValue = value;
+                }
             }
+        }
+
+        internal new void Activate()
+        {
+            bind = new FullBind<TValue>(() => InternalValue, () => ExternalCachedValue);
         }
     }
 }

@@ -15,49 +15,38 @@
 // along with this program.If not, see <http://www.gnu.org/licenses/>.
 
 using Hyperplan.Fluor;
+using Hyperplan.Fluor.Library;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
+using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace Hyperplan.Selenium.Core
 {
-    class CollectionPropertyBridge<T> : BasePropertyBridge<T, IEnumerable, IList>
+    class HalfBind<T>
     {
         Monitor monitor;
 
-        internal CollectionPropertyBridge(T owner, string name) : base(owner, name)
+        public HalfBind(Expression<Func<T>> target, Func<T> source)
         {
-            monitor = new Monitor(() => UpdateInternalValue());
-        }
+            var targetGetter = target.Compile();
+            var targetSetter = Hyperplan.Fluor.Library.Utils.SetterFromExpression(target);
 
-        void UpdateInternalValue()
-        {
-            int extIndex = 0;
-            foreach (var extElement in ExternalValue)
+            monitor = new Monitor(() =>
             {
-                int intIndex = InternalValue.IndexOf(extElement);
-                if (intIndex != -1)
+                var sourceValue = source();
+                using (new Snapshot())
                 {
-                    if (intIndex != extIndex)
+                    var targetValue = targetGetter();
+                    if (!object.Equals(sourceValue, targetValue))
                     {
-                        InternalValue.RemoveAt(intIndex);
-                        InternalValue.Insert(extIndex, extElement);
+                        return () => targetSetter(sourceValue);
                     }
                 }
-                else
-                {
-                    InternalValue.Insert(extIndex, extElement);
-                }
-                extIndex++;
-            }
-            while (InternalValue.Count > extIndex)
-            {
-                InternalValue.RemoveAt(extIndex);
-            }
+                return null;
+            });
         }
     }
 }

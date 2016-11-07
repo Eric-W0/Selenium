@@ -36,6 +36,7 @@
 // This file was automatically generated!
 
 using Hyperplan.Fluor;
+using Hyperplan.Fluor.Library;
 using Hyperplan.Selenium.Core;
 using System;
 using System.Windows;
@@ -60,135 +61,207 @@ namespace Hyperplan.Selenium
 	foreach (var type in allTypes)
 	{
 #>
+
 	public class <#= type.Name #> : <#= type.FullName #>
 	{
+		bool initialized;
 <#
-		foreach (var prop in GetAllProperties(type))
+		foreach (var entry in CollectAll(type))
 		{
-			if (prop.IsDProp)
+			if (!(entry is Attached))
 			{
-#>
-		DependencyPropertyBridge<<#= type.Name #>> bridge<#= prop.Info.Name #>;
-<#
-			}
-			else
-			{
-#>
-		RegularPropertyBridge<<#= type.Name #>> bridge<#= prop.Info.Name #>;
-<#
-			}
-		}
-		foreach (var coll in GetAllCollections(type))
-		{
-#>
-		CollectionPropertyBridge<<#= type.Name #>> bridge<#= coll.Name #>;
-
-<#
-		}
 #>
 
-		public <#= type.Name #>()
+		Cell<IProperty<<#= GetTypeText(entry.Type) #>>> cell<#= entry.Name #>;
+
+		public IProperty<<#= GetTypeText(entry.Type) #>> _<#= entry.Name #>_
 		{
-<#
-		foreach (var prop in GetAllProperties(type))
-		{
-#>
-			_<#= prop.Info.Name #> = new Cache<<#= GetTypeText(prop.Info.PropertyType) #>>(() => base.<#= prop.Info.Name #>);
-<#
-		}
-		foreach (var coll in GetAllCollections(type))
-		{
-#>
-			_<#= coll.Name #> = new Cache<IEnumerable<<#= GetTypeText(coll.ElementType) #>>>(() =>
+			get
 			{
-				var result = new List<<#= GetTypeText(coll.ElementType) #>>();
-				foreach (var element in base.<#= coll.Name #>)
-                {
-                    result.Add((<#= GetTypeText(coll.ElementType) #>)element);
+				Prepare<#= entry.Name #>();
+				return cell<#= entry.Name #>.Value;
+			}
+
+			set
+			{
+				Prepare<#= entry.Name #>();
+				cell<#= entry.Name #>.Value = value;
+			}
+		}
+
+		public new <#= GetTypeText(entry.Type) #> <#= entry.Name #>
+		{
+			get
+			{
+				Prepare<#= entry.Name #>();
+				return _<#= entry.Name #>_.Value;
+			}
+
+			set
+			{
+				Prepare<#= entry.Name #>();
+				_<#= entry.Name #>_.Value = value;
+			}
+		}
+
+<#
+			}
+			if (entry is Property)
+			{
+				var prop = (Property)entry;
+				if (prop.IsDProp)
+				{
+#>
+		DependencyPropertyBridge<<#= type.Name #>, <#= GetTypeText(entry.Type) #>> bridge<#= entry.Name #>;
+<#
 				}
-				return result;
-			});
+				else
+				{
+#>
+		RegularPropertyBridge<<#= type.Name #>, <#= GetTypeText(entry.Type) #>> bridge<#= entry.Name #>;
 <#
+				}
+			}
+			else if (entry is Collection)
+			{
+				var coll = (Collection)entry;
+#>
+		CollectionBridge<<#= type.Name #>, <#= GetTypeText(coll.ElementType) #>> bridge<#= entry.Name #>;
+<#
+			}
+			else if (entry is Event)
+			{
+				var evt = (Event)entry;
+#>
+        EventBridge<<#= type.Name #>, <#= GetTypeText(entry.Type) #>> bridge<#= entry.Name #>;
+<#
+			}
+		}
+	    foreach (var pair in mapping)
+		{
+			foreach (var entry in pair.Value)
+			{
+				var attached = entry as Attached;
+				if ((attached != null) && (attached.IsValidTarget(type)))
+				{
+#>
+
+		public <#= GetTypeText(attached.Type) #> <#= pair.Key.Name #>_<#= attached.Name #>
+		{
+			get
+			{
+				return <#= GetTypeText(pair.Key) #>.Get<#= attached.Name #>(this);
+			}
+
+			set
+			{
+				<#= GetTypeText(pair.Key) #>.Set<#= attached.Name #>(this, value);
+			}
+		}
+<#
+				}
+			}
 		}
 #>
+
+<#
+		foreach (var entry in CollectAll(type))
+		{
+			if (!(entry is Attached))
+			{
+#>
+
+		void Prepare<#= entry.Name #>()
+		{
+			if (bridge<#= entry.Name #> == null)
+			{
+<#
+				if (entry is Property)
+				{
+					var prop = (Property)entry;
+					if (prop.IsDProp)
+					{
+#>
+				bridge<#= entry.Name #> = new DependencyPropertyBridge<<#= type.Name #>, <#= GetTypeText(entry.Type) #>>(this, "<#= entry.Name #>");
+<#
+					}
+					else
+					{
+#>
+				bridge<#= entry.Name #> = new RegularPropertyBridge<<#= type.Name #>, <#= GetTypeText(entry.Type) #>>(this, "<#= entry.Name #>");
+<#
+					}
+#>
+				cell<#= entry.Name #> = new Cell<IProperty<<#= GetTypeText(entry.Type) #>>>(
+					new LazyCache<<#= GetTypeText(entry.Type) #>>(() =>
+					{
+						using (new Snapshot())
+						{
+							return bridge<#= entry.Name #>.InternalValue;
+						}
+					})
+				);
+<#
+				}
+				else if (entry is Collection)
+				{
+					var coll = (Collection)entry;
+#>
+				bridge<#= entry.Name #> = new CollectionBridge<<#= type.Name #>, <#= GetTypeText(coll.ElementType) #>>(this, "<#= entry.Name #>");				
+				cell<#= entry.Name #> = new Cell<IProperty<<#= GetTypeText(entry.Type) #>>>(
+					new LazyCache<<#= GetTypeText(entry.Type) #>>(() =>
+					{
+						using (new Snapshot())
+						{
+							return bridge<#= entry.Name #>.InternalValue;
+						}
+					})
+				);
+<#
+				}
+				else if (entry is Event)
+				{
+					var evt = (Event)entry;
+#>
+				bridge<#= entry.Name #> = new EventBridge<<#= type.Name #>, <#= GetTypeText(entry.Type) #>>(this, "<#= entry.Name #>");
+				cell<#= entry.Name #> = new Cell<IProperty<<#= GetTypeText(entry.Type) #>>>(
+					new Cell<<#= GetTypeText(entry.Type) #>>()
+				);
+<#
+			}
+#>
+				if (initialized)
+				{
+					bridge<#= entry.Name #>.Activate();
+				}
+			}
 		}
+<#
+			}
+		}
+#>
 
 		protected override void OnInitialized(EventArgs e)
 		{
 			base.OnInitialized(e);
 
 <#
-		foreach (var prop in GetAllProperties(type))
+		foreach (var entry in CollectAll(type))
 		{
-			if (prop.IsDProp)
+			if (!(entry is Attached))
 			{
 #>
-			bridge<#= prop.Info.Name #> = new DependencyPropertyBridge<<#= type.Name #>>(this, "<#= prop.Info.Name #>");
-<#
+			if (bridge<#= entry.Name #> != null)
+			{
+				bridge<#= entry.Name #>.Activate();
 			}
-			else
-			{
-#>
-			bridge<#= prop.Info.Name #> = new RegularPropertyBridge<<#= type.Name #>>(this, "<#= prop.Info.Name #>");
 <#
 			}
 		}
-		foreach (var coll in GetAllCollections(type))
-		{
 #>
-			bridge<#= coll.Name #> = new CollectionPropertyBridge<<#= type.Name #>>(this, "<#= coll.Name #>");
-<#
+			initialized = true;
 		}
-#>
-		}
-
-<#
-		foreach (var prop in GetAllProperties(type))
-		{
-#>
-		Cache<<#= GetTypeText(prop.Info.PropertyType) #>> _<#= prop.Info.Name #>;
-
-		public new virtual <#= GetTypeText(prop.Info.PropertyType) #> <#= prop.Info.Name #>
-		{
-			get
-			{
-				return _<#= prop.Info.Name #>.Get();
-			}
-
-			set
-			{
-				_<#= prop.Info.Name #>.Set(value);
-			}
-		}
-
-<#
-		}
-#>
-
-<#
-		foreach (var coll in GetAllCollections(type))
-		{
-#>
-		Cache<IEnumerable<<#= GetTypeText(coll.ElementType) #>>> _<#= coll.Name #>;
-
-		public new virtual IEnumerable<<#= GetTypeText(coll.ElementType) #>> <#= coll.Name #>
-		{
-			get
-			{
-				return _<#= coll.Name #>.Get();
-			}
-
-			set
-			{
-				_<#= coll.Name #>.Set(value);
-			}
-		}
-
-<#
-		}
-#>
 	}
-
 <#
 	}
 #>
@@ -202,27 +275,52 @@ namespace Hyperplan.Selenium
 		return provider.GetTypeOutput(new CodeTypeReference(type));
 	}
 
-	class Property
+	interface Entry
 	{
+	    string Name { get; }
+		Type Type { get; }
+	}
+
+	class Property : Entry
+	{
+	    public string Name => Info.Name;
+		public Type Type => Info.PropertyType;
+
 		public PropertyInfo Info { get; set; }
 
-		public bool IsDProp
+		public bool IsDProp => Info.DeclaringType.GetField($"{Info.Name}Property") != null;
+	}
+
+	class Attached : Entry
+	{
+		public string Name => Info.Name.Substring(3);
+		public Type Type => Info.ReturnType;
+
+		public MethodInfo Info { get; set; }
+
+		public bool IsValidTarget(Type type)
 		{
-			get
-			{
-				return Info.DeclaringType.GetField($"{Info.Name}Property") != null;
-			}
+			return Info.GetParameters()[0].ParameterType.IsAssignableFrom(type);
 		}
 	}
 
-	class Collection
+	class Collection : Entry
 	{
 		public string Name { get; set; }
+		public Type Type => typeof(IEnumerable<>).MakeGenericType(ElementType);
+
 		public Type ElementType { get; set; }
 	}
 
-	Dictionary<Type, Property[]> propMapping;
-	Dictionary<Type, Collection[]> collMapping;
+	class Event : Entry
+	{
+	    public string Name => Info.Name;
+		public Type Type => Info.EventHandlerType;
+
+		public EventInfo Info { get; set; }
+	}
+
+	Dictionary<Type, Entry[]> mapping;
 	List<string> excluded;
 
 	static Type GetType(string fullName)
@@ -242,24 +340,34 @@ namespace Hyperplan.Selenium
 	{
 		var xdoc = XDocument.Load(xmlPath);
 
-		propMapping = new Dictionary<Type, Property[]>();
-		collMapping = new Dictionary<Type, Collection[]>();
+		mapping = new Dictionary<Type, Entry[]>();
 		foreach (var classNode in xdoc.Descendants("class"))
 		{
 			var classType = GetType(classNode.Attribute("id").Value);
 
-			var props = (from p in classNode.Elements("prop")
-			             select new Property() {
-							 Info = classType.GetProperty(p.Value),
-						 }).ToArray<Property>();
-			propMapping.Add(classType, props);
+			var results = new List<Entry>();
+			results.AddRange(from p in classNode.Elements("prop")
+			                 select new Property() {
+							     Info = classType.GetProperty(p.Value),
+						     });
+			results.AddRange(from c in classNode.Elements("coll")
+			                 select new Collection() {
+					             Name = c.Value,
+							     ElementType = GetType(c.Attribute("elt").Value)
+						     });
+			results.AddRange(from e in classNode.Elements("event")
+			                 select new Event() {
+						         Info = classType.GetEvent(e.Value)
+					         });
+			results.AddRange(from a in classNode.Elements("attached")
+			                 select new Attached() {
+							     Info = classType.GetMethod(
+								     $"Get{a.Value}",
+									 System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static
+							     )
+							 });
 
-			var colls = (from c in classNode.Elements("coll")
-			             select new Collection() {
-					         Name = c.Value,
-							 ElementType = GetType(c.Attribute("elt").Value)
-						 }).ToArray<Collection>();
-			collMapping.Add(classType, colls);
+			mapping.Add(classType, results.ToArray<Entry>());
 		}
 
 		excluded = new List<string>();
@@ -291,37 +399,20 @@ namespace Hyperplan.Selenium
 		return false;
 	}
 
-	Property[] GetAllProperties(Type type)
+	Entry[] CollectAll(Type type)
 	{
-		var typeName = type.Name;
-		var result = new List<Property>();
+	    var enclosingTypeName = type.Name;
+		var result = new List<Entry>();
 		for (; type != typeof(object); type = type.BaseType)
 		{
-			Property[] props;
-			if (propMapping.TryGetValue(type, out props))
+			Entry[] entries;
+			if (mapping.TryGetValue(type, out entries))
 			{
-				result.AddRange(from p in props
-				                where !p.Info.Name.Equals(typeName)
-								select p);
+				result.AddRange(from e in entries
+				                where (e.Name != enclosingTypeName)
+								select e);
 			}
 		}
-		return result.OrderBy(p => p.Info.Name).ToArray<Property>();
-	}
-
-	Collection[] GetAllCollections(Type type)
-	{
-		var typeName = type.Name;
-		var result = new List<Collection>();
-		for (; type != typeof(object); type = type.BaseType)
-		{
-			Collection[] colls;
-			if (collMapping.TryGetValue(type, out colls))
-			{
-				result.AddRange(from c in colls
-				                where !c.Name.Equals(typeName)
-								select c);
-			}
-		}
-		return result.OrderBy(c => c.Name).ToArray<Collection>();
+		return result.OrderBy(x => x.Name).ToArray<Entry>();
 	}
 #>

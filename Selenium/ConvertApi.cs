@@ -40,7 +40,7 @@ namespace Hyperplan.Selenium
                 {
                     throw new ArgumentException($"No converter for type {valueType}");
                 }
-                Type convType = tca.ConverterTypeName.SearchType();
+                Type convType = Utils.SearchType(tca.ConverterTypeName);
                 if (convType == null)
                 {
                     throw new ArgumentException($"Converter for type {valueType} is not available");

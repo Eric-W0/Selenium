@@ -50,20 +50,19 @@ namespace Hyperplan.Selenium.Samples
                 {
                     HorizontalAlignment = HorizontalAlignment.Center,
                     VerticalAlignment = VerticalAlignment.Center,
+                    _Text_ = new Driver<string>(() =>
+                    {
+                        if (lb.SelectedItem != null)
+                        {
+                            return $"You have selected [{lb.SelectedItem.Source}]";
+                        }
+                        else
+                        {
+                            return "No family selected";
+                        }
+                    })
                 };
                 DockPanel.SetDock(desc, Dock.Bottom);
-
-                desc.AttachOneWay(() => desc.Text, () =>
-                {
-                    if (lb.SelectedItem != null)
-                    {
-                        return $"You have selected [{lb.SelectedItem.Source}]";
-                    }
-                    else
-                    {
-                        return "No family selected";
-                    }
-                });
 
                 return new Window()
                 {

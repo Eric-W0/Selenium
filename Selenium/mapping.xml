@@ -1,6 +1,27 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
+<!--
+  Selenium Framework
+  Copyright(C) 2016 Eric Blond
+
+  This program is free software: you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as published by
+  the Free Software Foundation, either version 3 of the License, or
+  (at your option) any later version.
+
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.See the
+  GNU General Public License for more details.
+
+  You should have received a copy of the GNU General Public License
+  along with this program.If not, see <http://www.gnu.org/licenses/>.
+-->
 <mapping>
 
+  <class id="System.Windows.Controls.Primitives.ButtonBase">
+    <event>Click</event>
+  </class>
+  
   <class id="System.Windows.Controls.ColumnDefinition">
     <prop>Width</prop>
   </class>
@@ -30,6 +51,8 @@
 
   <class id="System.Windows.Controls.DockPanel">
     <prop>LastChildFill</prop>
+
+    <attached>Dock</attached>
   </class>
 
   <class id="System.Windows.Controls.Expander">
@@ -39,6 +62,8 @@
   <class id="System.Windows.Controls.Grid">
     <coll elt="System.Windows.Controls.ColumnDefinition">ColumnDefinitions</coll>
     <coll elt="System.Windows.Controls.RowDefinition">RowDefinitions</coll>
+
+    <attached>Row</attached>
   </class>
 
   <class id="System.Windows.Controls.GridView">
@@ -74,7 +99,8 @@
   <class id="System.Windows.Controls.MenuItem">
     <prop>Icon</prop>
     <prop>IsCheckable</prop>
-    <prop>IsChecked</prop>    
+    <prop>IsChecked</prop>
+    <event>Click</event>
   </class>
   
   <class id="System.Windows.Controls.Panel">

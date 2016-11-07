@@ -15,8 +15,11 @@
 // along with this program.If not, see <http://www.gnu.org/licenses/>.
 
 using Hyperplan.Fluor;
+using Hyperplan.Fluor.Library;
+using Hyperplan.Selenium.Core;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 using System.Text;
@@ -24,46 +27,29 @@ using System.Threading.Tasks;
 
 namespace Hyperplan.Selenium.Core
 {
-    class BasePropertyBridge<TOwner, TExternal, TInternal>
+    class Bridge<TOwner, TValue>
     {
-        TOwner owner;
+        protected TOwner owner;
         PropertyInfo externalInfo;
-        PropertyInfo internalInfo;
+        LazyCache<TValue> externalCache;
 
-        protected BasePropertyBridge(TOwner owner, string name)
+        internal Bridge(TOwner owner, string name)
         {
             this.owner = owner;
-            externalInfo = typeof(TOwner).GetTopMostProperty(name);
-            internalInfo = typeof(TOwner).BaseType.GetProperty(name);
-
-            _ExternalValue = new Cache<TExternal>(() => (TExternal)externalInfo.GetValue(owner));
+            externalInfo = Utils.SearchPublicProperty(typeof(TOwner), name);
+            externalCache = new LazyCache<TValue>(() => (TValue)externalInfo.GetValue(owner));
         }
 
-        readonly Cache<TExternal> _ExternalValue;
-
-        protected TExternal ExternalValue
+        internal TValue ExternalCachedValue
         {
             get
             {
-                return _ExternalValue.Get();
+                return externalCache.Value;
             }
 
             set
             {
                 externalInfo.SetValue(owner, value);
-            }
-        }
-
-        protected TInternal InternalValue
-        {
-            get
-            {
-                return (TInternal)internalInfo.GetValue(owner);
-            }
-
-            set
-            {
-                internalInfo.SetValue(owner, value);
             }
         }
     }

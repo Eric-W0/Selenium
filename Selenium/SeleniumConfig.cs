@@ -15,21 +15,15 @@
 // along with this program.If not, see <http://www.gnu.org/licenses/>.
 
 using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
-namespace Hyperplan.Selenium.Samples
+namespace Hyperplan.Selenium
 {
-    public static class HelloWorldApp
+    public static class SeleniumConfig
     {
-        [STAThread]
-        public static void Main()
-        {
-            System.Windows.Application app = new System.Windows.Application();
-            app.Run(new Hyperplan.Selenium.Window()
-            {
-                Title = "Hello World!",
-                Height = 350.0,
-                Width = 525.0
-            });
-        }
+        public static bool DebugWpfDataFlow = false;
     }
 }

@@ -14,55 +14,47 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.If not, see <http://www.gnu.org/licenses/>.
 
+using Hyperplan.Fluor;
 using Hyperplan.Fluor.Library;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
-using System.Windows;
 
-namespace Hyperplan.Selenium
+namespace Hyperplan.Selenium.Core
 {
-    public class TemplateControl : ContentControl
+    abstract class PropertyBridge<TOwner, TOuter, TInner> : Bridge<TOwner, TOuter>
     {
-        public static readonly DependencyProperty GeneratorProperty =
-            DependencyProperty.Register(
-                "Generator",
-                typeof(Func<object, object>),
-                typeof(TemplateControl)
-            );
+        protected PropertyInfo nativeInfo;
 
-        public TemplateControl()
+        internal PropertyBridge(TOwner owner, string name) : base(owner, name)
         {
-            _Content_ = new Driver<object>(() => Content);
+            this.owner = owner;
+            nativeInfo = Utils.SearchPublicProperty(typeof(TOwner).BaseType, name);
         }
 
-        public Func<object, object> Generator
+        internal virtual TInner NativeValue
         {
             get
             {
-                return (Func<object, object>)GetValue(GeneratorProperty);
+                var result = (TInner)nativeInfo.GetValue(owner);
+                if (SeleniumConfig.DebugWpfDataFlow)
+                {
+                    Debug.WriteLine($"GET [{owner.GetType().Name}.{nativeInfo.Name}] => [{result}]");
+                }
+                return result;
             }
 
             set
             {
-                SetValue(GeneratorProperty, value);
-            }
-        }
-
-        new object Content
-        {
-            get
-            {
-                if ((Generator != null) && (DataContext != null))
+                if (SeleniumConfig.DebugWpfDataFlow)
                 {
-                    return Generator(DataContext);
+                    Debug.WriteLine($"SET [{owner.GetType().Name}.{nativeInfo.Name}] <= [{value}]");
                 }
-                else
-                {
-                    return base.Content;
-                }
+                nativeInfo.SetValue(owner, value);
             }
         }
     }

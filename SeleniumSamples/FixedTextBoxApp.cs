@@ -14,31 +14,28 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.If not, see <http://www.gnu.org/licenses/>.
 
-using Hyperplan.Fluor;
 using Hyperplan.Fluor.Library;
-using Hyperplan.Selenium;
 using System;
-using System.Windows;
 
 namespace Hyperplan.Selenium.Samples
 {
-    public static class WindowSizeApp
+    public static class FixedTextBoxApp
     {
         [STAThread]
         public static void Main()
         {
             System.Windows.Application app = new System.Windows.Application();
-            app.Run(new Window().Let(w =>
+            app.Run(new Window()
             {
-                w.Title = "Window Size App";
-                w.Content = new TextBlock()
+                Title = "Fixed TextBox",
+                Content = new TextBox()
                 {
-                    HorizontalAlignment = HorizontalAlignment.Center,
-                    VerticalAlignment = VerticalAlignment.Center,
-                    FontSize = 50.0,
-                    _Text_ = new Driver<string>(() => $"[{w.Width}x{w.Height}]")
-                };
-            }));
+                    HorizontalAlignment = System.Windows.HorizontalAlignment.Center,
+                    VerticalAlignment = System.Windows.VerticalAlignment.Center,
+                    Width = 100.0,
+                    _Text_ = new Driver<string>(() => "Test")
+                }
+            });
         }
     }
 }

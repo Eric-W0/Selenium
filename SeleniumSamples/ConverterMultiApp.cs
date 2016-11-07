@@ -14,188 +14,187 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.If not, see <http://www.gnu.org/licenses/>.
 
-//using Hyperplan.Fluor;
-//using System;
-//using System.Collections.Generic;
-//using System.Linq;
-//using System.Text;
-//using System.Threading.Tasks;
-//using System.Windows;
-//using Hyperplan.Selenium;
+using Hyperplan.Fluor;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System.Windows;
+using Hyperplan.Selenium;
+using Hyperplan.Fluor.Library;
 
-//namespace Hyperplan.Selenium.Samples
-//{
-//    public class ConverterMultiApp : System.Windows.Application
-//    {
-//        readonly IProperty<ConverterModel> _Model = new Cell<ConverterModel>(new ConverterModel());
-//        ConverterModel Model
-//        {
-//            get
-//            {
-//                return _Model.Get();
-//            }
+namespace Hyperplan.Selenium.Samples
+{
+    public class ConverterMultiApp : System.Windows.Application
+    {
+        Cell<ConverterModel> model = new Cell<ConverterModel>(new ConverterModel());
 
-//            set
-//            {
-//                _Model.Set(value);
-//            }
-//        }
+        ConverterModel Model
+        {
+            get
+            {
+                return model.Value;
+            }
 
-//        readonly IProperty<bool> _UseTabbedView = new Cell<bool>();
-//        bool UseTabbedView
-//        {
-//            get
-//            {
-//                return _UseTabbedView.Get();
-//            }
+            set
+            {
+                model.Value = value;
+            }
+        }
 
-//            set
-//            {
-//                _UseTabbedView.Set(value);
-//            }
-//        }
+        Cell<bool> useTabbedView = new Cell<bool>();
 
-//        object TabbedCenterView => new TabControl()
-//        {
-//            Items = new object[]
-//            {
-//                new TabItem()
-//                {
-//                    Header = "First View",
-//                    Content = new ConverterView()
-//                    {
-//                        _Model = _Model,
-//                        HorizontalAlignment = HorizontalAlignment.Center,
-//                        VerticalAlignment = VerticalAlignment.Center
-//                    }
-//                },
-//                new TabItem()
-//                {
-//                    Header = "Second View",
-//                    Content = new ConverterView2()
-//                    {
-//                        _Model = _Model,
-//                        HorizontalAlignment = HorizontalAlignment.Center,
-//                        VerticalAlignment = VerticalAlignment.Center
-//                    }
-//                }
-//            }
-//        };
+        bool UseTabbedView
+        {
+            get
+            {
+                return useTabbedView.Value;
+            }
 
-//        object StackedCenterView => new Grid()
-//        {
-//            RowDefinitions = new RowDefinition[]
-//            {
-//                new RowDefinition(),
-//                new RowDefinition()
-//            },
-//            ColumnDefinitions = new ColumnDefinition[]
-//            {
-//                new ColumnDefinition()
-//            },
-//            Children = new UIElement[]
-//            {
-//                new GroupBox().Let(o =>
-//                {
-//                    o.Header = "First View";
-//                    o.Content = new ConverterView()
-//                    {
-//                        _Model = _Model
-//                    };
-//                    o.HorizontalAlignment = HorizontalAlignment.Center;
-//                    o.VerticalAlignment = VerticalAlignment.Center;
-//                    Grid.SetRow(o, 0);
-//                }),
-//                new GroupBox().Let(o =>
-//                {
-//                    o.Header = "Second View";
-//                    o.Content = new ConverterView2()
-//                    {
-//                        _Model = _Model
-//                    };
-//                    o.HorizontalAlignment = HorizontalAlignment.Center;
-//                    o.VerticalAlignment = VerticalAlignment.Center;
-//                    Grid.SetRow(o, 1);
-//                })
-//            }
-//        };
+            set
+            {
+                useTabbedView.Value = value;
+            }
+        }
 
-//        object CenterView => UseTabbedView ? TabbedCenterView : StackedCenterView;
+        object TabbedCenterView => new TabControl()
+        {
+            Items = new object[]
+            {
+                new TabItem()
+                {
+                    Header = "First View",
+                    Content = new ConverterView()
+                    {
+                        _Model_ = model
+                    }.UIElement
+                },
+                new TabItem()
+                {
+                    Header = "Second View",
+                    Content = new ConverterView2()
+                    {
+                        _Model_ = model
+                    }.UIElement
+                }
+            }
+        };
 
-//        UIElement MenuSection => new Menu().Let(o =>
-//        {
-//            o.Items = new object[]
-//            {
-//                new MenuItem()
-//                {
-//                    Header = "_File",
-//                    Items = new object[]
-//                    {
-//                        new MenuItem().Let(o2 =>
-//                        {
-//                            o2.Header = "E_xit";
-//                            o2.Click += (s, e) => Shutdown();
-//                        })
-//                    }
-//                },
-//                new MenuItem()
-//                {
-//                    Header = "_View",
-//                    Items = new object[]
-//                    {
-//                        new MenuItem().Let(o2 =>
-//                        {
-//                            o2.Header = "Use Tabbed View";
-//                            o2.IsCheckable = true;
-//                            o2._IsChecked = _UseTabbedView;
-//                        })
-//                    }
-//                }
-//            };
-//            DockPanel.SetDock(o, System.Windows.Controls.Dock.Top);
-//        });
+        object StackedCenterView => new Grid()
+        {
+            RowDefinitions = new RowDefinition[]
+            {
+                new RowDefinition(),
+                new RowDefinition()
+            },
+            ColumnDefinitions = new ColumnDefinition[]
+            {
+                new ColumnDefinition()
+            },
+            Children = new UIElement[]
+            {
+                new GroupBox()
+                {
+                    Header = "First View",
+                    Content = new ConverterView()
+                    {
+                        _Model_ = model
+                    }.UIElement,
+                    HorizontalAlignment = HorizontalAlignment.Center,
+                    VerticalAlignment = VerticalAlignment.Center,
+                    Grid_Row = 0
+                },
+                new GroupBox()
+                {
+                    Header = "Second View",
+                    Content = new ConverterView2()
+                    {
+                        _Model_ = model
+                    }.UIElement,
+                    HorizontalAlignment = HorizontalAlignment.Center,
+                    VerticalAlignment = VerticalAlignment.Center,
+                    Grid_Row = 1
+                }
+            }
+        };
 
-//        UIElement CenterSection => new ContentControl()
-//        {
-//            _Content = new Property<object>(() => CenterView, null),
-//            Margin = ConvertApi.Convert<int, Thickness>(10)
-//        };
+        object CenterView => UseTabbedView ? TabbedCenterView : StackedCenterView;
 
-//        UIElement ButtonSection => new Button().Let(o =>
-//        {
-//            o.Content = "Reset";
-//            o.Margin = ConvertApi.Convert<int, Thickness>(10);
-//            o.Width = 80;
-//            o.VerticalAlignment = VerticalAlignment.Center;
-//            o.HorizontalAlignment = HorizontalAlignment.Center;
-//            o.Click += (s, e) => Model = new ConverterModel();
-//            DockPanel.SetDock(o, System.Windows.Controls.Dock.Bottom);
-//        });
+        UIElement MenuSection => new Menu().Let(o =>
+        {
+            o.Items = new object[]
+            {
+                new MenuItem()
+                {
+                    Header = "_File",
+                    Items = new object[]
+                    {
+                        new MenuItem()
+                        {
+                            Header = "E_xit",
+                            Click = (s, e) => Shutdown()
+                        }
+                    }
+                },
+                new MenuItem()
+                {
+                    Header = "_View",
+                    Items = new object[]
+                    {
+                        new MenuItem()
+                        {
+                            Header = "Use Tabbed View",
+                            IsCheckable = true,
+                            _IsChecked_ = useTabbedView
+                        }
+                    }
+                }
+            };
+            DockPanel.SetDock(o, System.Windows.Controls.Dock.Top);
+        });
 
-//        new void Run()
-//        {
-//            base.Run(new Hyperplan.Selenium.Window()
-//            {
-//                Title = "Temperature Converter - 3",
-//                Content = new DockPanel()
-//                {
-//                    Children = new UIElement[]
-//                    {
-//                        MenuSection,
-//                        ButtonSection,
-//                        CenterSection
-//                    }
-//                },
-//                WindowStartupLocation = WindowStartupLocation.CenterScreen,
-//                Width = 600,
-//                Height = 400
-//            });
-//        }
+        UIElement CenterSection => new ContentControl()
+        {
+            Margin = ConvertApi.Convert<int, Thickness>(10),
+            _Content_ = new Driver<object>(() => CenterView)
+        };
 
-//        [STAThread]
-//        public static void Main()
-//        {
-//            new ConverterMultiApp().Run();
-//        }
-//    }
-//}
+        UIElement ButtonSection => new Button()
+        {
+            Content = "Reset",
+            Margin = ConvertApi.Convert<int, Thickness>(10),
+            Width = 80,
+            VerticalAlignment = VerticalAlignment.Center,
+            HorizontalAlignment = HorizontalAlignment.Center,
+            Click = (s, e) => Model = new ConverterModel(),
+            DockPanel_Dock = System.Windows.Controls.Dock.Bottom
+        };
+
+        new void Run()
+        {
+            base.Run(new Hyperplan.Selenium.Window()
+            {
+                Title = "Temperature Converter - 3",
+                Content = new DockPanel()
+                {
+                    Children = new UIElement[]
+                    {
+                        MenuSection,
+                        ButtonSection,
+                        CenterSection
+                    }
+                },
+                WindowStartupLocation = WindowStartupLocation.CenterScreen,
+                Width = 600,
+                Height = 400
+            });
+        }
+
+        [STAThread]
+        public static void Main()
+        {
+            new ConverterMultiApp().Run();
+        }
+    }
+}
